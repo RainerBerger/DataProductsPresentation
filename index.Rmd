@@ -1,0 +1,179 @@
+---
+title       : Wealth Projection Simulation
+subtitle    : 
+author      : Rainer
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Wealth Projection
+
+
+<p>We present a simple projection used for financial planning.<p>
+
+<p>Based on the level of risk that you are willing to take and the level of returns that you are expecting, a prediction of your future wealth can be made. </p>
+
+--- .class #id 
+
+## Calculating the expected wealth
+
+<p>The expected wealth can be computed from the initial wealth and the expected returns.</p>
+
+<p>Obviously, the higher the expected returns, the faster the wealth will grow.</p>
+
+```{r echo=FALSE}
+calc_ages <- function(age,horizon) {
+  ages <- rep(age, horizon)
+  for(i in 2:horizon) 
+  {
+    ages[i] <- ages[i-1]+1
+  }
+  return(ages)
+}
+
+# Calculate the projected wealth given the desired returns
+calc_wealth <- function(initWealth, retn, horizon) {
+  wealth <- rep(initWealth, horizon)
+  retpercent <- retn/100.0
+  for(i in 2:horizon)
+  {
+    wealth[i] <- wealth[i-1]*(1+retpercent)
+  }
+  return(wealth)
+}
+
+w <- calc_wealth(5, 3, 35)
+plot(w, type="l", col="blue", xlab="Years", ylab="Projected Wealth (M)", main="Projected Wealth")
+```
+
+---- .class #id
+
+
+## Using the Risk
+
+<p>With higher risks, there will be a greater variability in the actual wealth that is accumulated.</p>
+
+<p>The higher the risks, the greater the spread between the upper and lower lines.</p>
+
+```{r echo=FALSE}
+# Calculate the standard deviations given the risks
+calc_stds <- function(risk, horizon) {
+  stds <- rep(risk, horizon) 
+  for(i in 2:horizon)
+  {
+    stds[i] <- risk*sqrt(i)
+  }
+  return(stds)
+}
+
+# Returns the upper curve which represents the mean + 1 sigma for the
+# projected wealth
+calc_upper67 <- function(wealth, stds, horizon) {
+  upper67 <- rep(wealth[1], horizon) 
+  for(i in 2:horizon)
+  {
+    upper67[i] <- wealth[i]*(1+stds[i]/100.0)
+  }
+  return(upper67)
+}
+
+# Returns the lower curve which represents the mean - 1 sigma for the
+# projected wealth
+calc_lower67 <- function(wealth, stds, horizon) {
+  lower67 <- rep(wealth[1], horizon) 
+  for(i in 2:horizon)
+  {
+    lower67[i] <- wealth[i]*(1-stds[i]/100.0)
+  }
+  return(lower67)
+}
+
+# Calculate the projected wealth given the desired returns
+calc_wealth <- function(initWealth, retn, horizon) {
+  wealth <- rep(initWealth, horizon)
+  retpercent <- retn/100.0
+  for(i in 2:horizon)
+  {
+    wealth[i] <- wealth[i-1]*(1+retpercent)
+  }
+  return(wealth)
+}
+
+w <- calc_wealth(5, 5, 35)
+stds <- calc_stds(3, 35)
+upper67 <- calc_upper67(w, stds, 35)
+lower67 <- calc_lower67(w, stds, 35)
+
+plot(w, type="l", col="blue", xlab="Years", ylab="Projected Wealth (M)", main="Projected Wealth")
+lines(upper67, type="l", lty=2, lwd=2, col="green")
+lines(lower67, type="l", lty=3, lwd=2, col="forestgreen")
+
+```
+
+---- .class #id
+
+
+## Putting it together
+
+<p>The graph gives you some sense of how risk and return are related to each other.</p>
+
+<p>However, you will need to assess whether the expected returns and desired risks are appropriate in the current investment climate.</p>
+
+```{r echo=FALSE}
+# Calculate the standard deviations given the risks
+calc_stds <- function(risk, horizon) {
+  stds <- rep(risk, horizon) 
+  for(i in 2:horizon)
+  {
+    stds[i] <- risk*sqrt(i)
+  }
+  return(stds)
+}
+
+# Returns the upper curve which represents the mean + 1 sigma for the
+# projected wealth
+calc_upper67 <- function(wealth, stds, horizon) {
+  upper67 <- rep(wealth[1], horizon) 
+  for(i in 2:horizon)
+  {
+    upper67[i] <- wealth[i]*(1+stds[i]/100.0)
+  }
+  return(upper67)
+}
+
+# Returns the lower curve which represents the mean - 1 sigma for the
+# projected wealth
+calc_lower67 <- function(wealth, stds, horizon) {
+  lower67 <- rep(wealth[1], horizon) 
+  for(i in 2:horizon)
+  {
+    lower67[i] <- wealth[i]*(1-stds[i]/100.0)
+  }
+  return(lower67)
+}
+
+# Calculate the projected wealth given the desired returns
+calc_wealth <- function(initWealth, retn, horizon) {
+  wealth <- rep(initWealth, horizon)
+  retpercent <- retn/100.0
+  for(i in 2:horizon)
+  {
+    wealth[i] <- wealth[i-1]*(1+retpercent)
+  }
+  return(wealth)
+}
+
+w <- calc_wealth(5, 8, 35)
+stds <- calc_stds(6, 35)
+upper67 <- calc_upper67(w, stds, 35)
+lower67 <- calc_lower67(w, stds, 35)
+
+plot(w, type="l", col="blue", xlab="Years", ylab="Projected Wealth (M)", main="Projected Wealth")
+lines(upper67, type="l", lty=2, lwd=2, col="green")
+lines(lower67, type="l", lty=3, lwd=2, col="forestgreen")
+```
